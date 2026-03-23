@@ -76,7 +76,6 @@ begin
 			minimo(d1,d2,min,det1,det2);
 		end;
 		
-		leerM(mae1,m);
 		while (m.nombreProvincia <> provinciaActual) do //el 0 ese es la idea de esto
 			leerM(mae1,m);
 		

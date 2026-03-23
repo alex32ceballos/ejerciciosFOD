@@ -23,7 +23,7 @@ En cada detalle
 puede venir 0 o N registros de un determinado producto.}
 
 
-program untitled;
+program p2_5;
 const
 	valoralto = 9999;
 	dimF = 30;
@@ -31,7 +31,7 @@ type
 	producto = record
 		codigo:integer;
 		nombre:string;
-		descripion:string;
+		descripcion:string;
 		stockDisponible:integer;
 		stockMin:integer;
 		precio:real;
@@ -58,16 +58,76 @@ begin
 	if (not eof(det)) then read(det,d)
 	else d.codigo := valoralto;
 end;
-	
+
+procedure minimo(var d: reg_detalle; var min:venta; var det:arc_detalle);
+var i:integer; minPos:integer;
+begin
+	min.codigo:=valoralto;
+	minPos:=-1;
+	for i:=1 to dimF do begin
+		if (d[i].codigo < min.codigo) then begin
+			min:=d[i];
+			minPos:=i;
+		end;
+	end;
+	if minPos<>-1 then
+		leerD(det[minPos],d[minPos]);
+end;
+
+procedure cargarDetalles(var d:reg_detalle; var det:arc_detalle);
+var i:integer; nombre:string;
+begin
+	for i:=1 to dimF do begin
+		readln(nombre);
+		assign(det[i],nombre);
+		reset(det[i]);
+		leerD(det[i],d[i]);
+	end;
+end;
+
+procedure actualizar(var det:arc_detalle; var mae:maestro; var archtxt:text);
+var
+	d:reg_detalle; actual,min:venta; m:producto; i:integer;
+begin
+	rewrite(archtxt);
+	cargarDetalles(d,det);
+	reset(mae);
+	leerM(mae,m);
+	minimo(d,min,det);
+	while (min.codigo <>valoralto) do begin
+		actual.codigo:=min.codigo;
+		actual.cantVendidas:=0;
+		while (min.codigo = actual.codigo) do begin
+			actual.cantVendidas := actual.cantVendidas + min.cantVendidas;
+			minimo(d,min,det);
+		end;
+		
+		while (m.codigo <> actual.codigo) do begin
+			leerM(mae,m);
+		end;
+		m.stockDisponible := m.stockDisponible - actual.cantVendidas;
+		{Además, se deberá informar en un archivo de texto: nombre de producto,
+descripción, stock disponible y precio de aquellos productos que tengan stock 
+disponible por
+debajo del stock mínimo.}
+		if (m.stockDisponible < m.stockMin) then
+			writeln(archtxt, m.nombre, m.descripcion, m.stockDisponible, m.precio);
+		seek(mae,filepos(mae)-1);
+		write(mae,m);
+	end;
+	for i:=1 to dimF do
+		close(det[i]);
+	close(mae);
+	close(archtxt);
+end;
 	
 var
-	deta:arc_detalle;
-	reg_det:reg_detalle;
+	det:arc_detalle;
 	mae:maestro;
-	regm:producto;
-
+	archtxt:text;
 BEGIN
-	
-	
+	assign(mae,'maestro');
+	assign(archtxt,'achtextoEJ5.txt');
+	actualizar(det,mae,archtxt);
 END.
 
