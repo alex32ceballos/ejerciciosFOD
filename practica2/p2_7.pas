@@ -137,8 +137,8 @@ begin
 			minimo(det,d,min);
 		end;
 		
-		while ((m.codigoLocalidad <> actual.codigoLocalidad) or (m.codigoCepa <> actual.codigoCepa)) do //sigue leyendo mientras ambos sean distintos
-			leerM(mae,m);
+		while ((m.codigoLocalidad < actual.codigoLocalidad) or (m.codigoCepa < actual.codigoCepa)) do //sigue leyendo mientras ambos sean distintos
+			leerM(mae,m); //this is perfect
 		
 		m.cantidadFallecidos := m.cantidadFallecidos + actual.cantidadFallecidos;
 		m.cantidadRecuperados := m.cantidadRecuperados + actual.cantidadRecuperados;
